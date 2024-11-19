@@ -1,0 +1,95 @@
+CREATE TABLE department (
+department_id int PRIMARY KEY,
+department_name varchar(45)
+);
+
+CREATE TABLE employee (
+employee_id int PRIMARY KEY,
+employee_name varchar(30),
+salary int,
+department_id int,
+FOREIGN KEY (department_id) REFERENCES department(department_id)
+);
+
+CREATE TABLE project (
+project_id int PRIMARY KEY,
+project_name varchar(30),
+employee_id int,
+FOREIGN KEY (employee_id) REFERENCES employee (employee_id)
+);
+
+insert into department
+values
+(732,'Civil'),
+(734,'EEE'),
+(736, 'Mechanical'),
+(737,'IT');
+
+
+insert into employee 
+values
+(21,'Mohammed',70000, 734),
+(52,'Abubaker',80000, 737),
+(53,'Yaseen',50000, 737),
+(80,'Idrees',60000, 734),
+(45,'Zeeshan',75000, Null),
+(36,'Anas',90000, 732),
+(55,'Sohail',65000, 736);
+
+insert into project 
+values
+(1,'Smart Grid System',21),
+(2,'IOT',52),
+(3,'Machine Learning',53),
+(4,'PLC',80),
+(5,'Civil Project',36),
+(6,'Project X',45),
+(7,'Mechanical Project',55);
+
+**Queries**
+
+SELECT e.employee_id, e.employee_name, e.salary, d.department_name
+FROM employee e
+LEFT JOIN department d ON e.department_id = d.department_id;
+
+
+SELECT e1.employee_id, e1.employee_name
+FROM employee e1, employee e2
+WHERE e1.salary > e2.salary;
+
+
+SELECT *
+FROM employee
+WHERE department_id NOT IN (1, 2);
+
+
+SELECT d.department_id, d.department_name, AVG(e.salary) AS average_salary
+FROM department d
+LEFT JOIN employee e ON d.department_id = e.department_id
+GROUP BY d.department_id, d.department_name
+HAVING AVG(e.salary) > 60000;
+
+
+SELECT e.employee_name, d.department_name, p.project_name
+FROM employee e
+LEFT JOIN department d ON e.department_id = d.department_id
+LEFT JOIN project p ON e.employee_id = p.employee_id;
+
+
+SELECT e.employee_id, e.employee_name, d.department_name, SUM(e.salary) AS total_salary
+FROM employee e
+JOIN project p ON e.employee_id = p.employee_id
+JOIN department d ON e.department_id = d.department_id
+GROUP BY e.employee_id, e.employee_name, d.department_name
+HAVING COUNT(p.project_id) > 1;
+
+
+SELECT e.*
+FROM employee e
+LEFT JOIN project p ON e.employee_id = p.employee_id
+WHERE p.project_id IS NULL;
+
+
+SELECT e.*
+FROM employee e
+WHERE e.salary > (SELECT AVG(salary) FROM employee WHERE department_id = e.department_id);
